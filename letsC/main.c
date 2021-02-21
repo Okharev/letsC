@@ -2,6 +2,8 @@
 
 #include "main.h"
 
+HINSTANCE gGameWindow;
+
 BOOL gGameIsRunning;
 
 int wWinMain(_In_ HINSTANCE Instance, _In_opt_ HINSTANCE PreviousInstance, _In_ PWSTR CommandLine, _In_ INT CmdShow)
@@ -27,11 +29,14 @@ int wWinMain(_In_ HINSTANCE Instance, _In_opt_ HINSTANCE PreviousInstance, _In_ 
 
 	while (gGameIsRunning == TRUE)
 	{
-		while (PeekMessageW(&Message, NULL, 0, 0) > 0)
+		while (PeekMessageW(&Message, gGameWindow,NULL, 0, 0, PM_REMOVE))
 		{
 			TranslateMessage(&Message);
 			DispatchMessageW(&Message);
 		}
+
+		// ProcessPlayerInput();
+
 	}
 
 Exit:
@@ -72,7 +77,6 @@ DWORD CreateMainGameWindow(void)
 	DWORD Result = ERROR_SUCCESS;
 
 	WNDCLASSEXW WindowClass = { 0 };
-	HWND WindowHandle = 0;
 	WindowClass.cbSize = sizeof(WNDCLASSEXW);
 	WindowClass.style = 0;
 	WindowClass.lpfnWndProc = MainWindowProc;
@@ -94,7 +98,7 @@ DWORD CreateMainGameWindow(void)
 		goto Exit;
 	}
 
-	WindowHandle = CreateWindowExW(
+	gGameWindow = CreateWindowExW(
 		WS_EX_CLIENTEDGE,
 		WindowClass.lpszClassName,
 		L"Window title",
@@ -110,7 +114,7 @@ DWORD CreateMainGameWindow(void)
 	);
 
 
-	if (WindowHandle == 0)
+	if (gGameWindow == 0)
 	{
 		Result = GetLastError();
 
